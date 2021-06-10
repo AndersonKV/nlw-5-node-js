@@ -1,20 +1,45 @@
-import { Request, Response } from 'express';
-import { getCustomRepository } from 'typeorm';
-import { SettingsRepository } from '../repositories/SettingRepository';
-import { SettingService } from '../services/SettingService';
+import { Request, Response } from "express";
+import { getCustomRepository } from "typeorm";
+import { SettingsRepository } from "../repositories/SettingsRepository";
+import { SettingsService } from "../services/SettingsService";
 
 class SettingsController {
-  async create(req: Request, res: Response) {
-    const { chat, username } = req.body;
+    async create(request: Request, response: Response) {
+        const { chat, username } = request.body;
 
-    try {
-      const settingService = new SettingService();
-      const settings = await settingService.create({ chat, username });
-      return res.status(200).json(settings);
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+        const settingsService = new SettingsService();
+
+        try {
+            const settings = await settingsService.create({ chat, username });
+    
+            return response.json(settings);
+        }catch(err) {
+            return response.status(400).json({
+                message: err.message,
+            })
+        }
     }
-  }
+
+    async findByUsername(request: Request, response: Response) {
+        const { username } = request.params;
+
+        const settingsService = new SettingsService();
+
+        const settings = await settingsService.findByUsername(username);
+
+        return response.json(settings);
+    }
+
+    async update(request: Request, response: Response) {
+        const { username } = request.params;
+        const { chat } = request.body;
+
+        const settingsService = new SettingsService();
+
+        const settings = await settingsService.update(username, chat);
+
+        return response.json(settings);
+    }
 }
 
 export { SettingsController };
